@@ -1,0 +1,5 @@
+Flask
+flask_socketio
+datetime
+sqlite3
+flask_cors
