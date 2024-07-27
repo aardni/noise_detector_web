@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, render_template, send_from_directory, jsonify
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import sqlite3
@@ -43,6 +43,7 @@ def alert():
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     notification = {'timestamp': timestamp, 'noise_level': noise_level}
     notifications.append(notification)
+
     # Emit notifikasi ke semua klien yang terhubung
     socketio.emit('new_notification', notification)
 
@@ -50,7 +51,13 @@ def alert():
     conn.execute('INSERT INTO noise_database (timestamp, noise_level) VALUES (?, ?)', (timestamp, noise_level))
     conn.commit()
     conn.close()
-    return 'Alert received', 200
+
+    # Mengembalikan respons JSON
+    return jsonify({
+        'status': 'success',
+        'message': 'Alert received',
+        'notification': notification
+    }), 200
 
 @app.route('/audio/<filename>')
 def audio(filename):
